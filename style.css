@@ -1,0 +1,14 @@
+/*
+ Theme Name:  Vue Theme
+ description: Test Vue Theme
+ Author:       Robert Turner
+ Template:     onepress
+ Version:      1.0.0
+*/
+
+@media (min-width: 768px) {
+  .customcard {
+      margin: .5em;
+      border: 2px #343a40 solid;
+    }
+}
