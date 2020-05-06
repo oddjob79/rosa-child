@@ -37,10 +37,15 @@ Vue.component('item-data', {
   },
 
   methods: {
-      emitItem(item_id) {
-        this.$emit('itememit', item_id);
-      }
+    emitItem(item_id) {
+      this.$emit('itememit', item_id);
+    }
   }
+})
+
+Vue.component('order-details', {
+  props: ['orderitem'],
+  template: `<li>{{orderitem}}</li>`
 })
 
 var app = new Vue({
@@ -50,7 +55,23 @@ var app = new Vue({
         categories: [],
         items: [],
         cat: 1,
-        basket: ''
+        basket: [],
+        basketCount: 0,
+        orderlines: [],
+        cust_name: '',
+        cust_phone: '',
+        cust_email: '',
+        locations: [],
+        selectedLocation: '',
+        pickupTime: '',
+        line_notes: [],
+        order_notes: ''
+      }
+    },
+
+    watch: {
+      basket: function () {
+        this.basketCount = JSON.parse(localStorage.basket).length;
       }
     },
 
@@ -79,19 +100,107 @@ var app = new Vue({
         })
       },
 
-      updateBasket(item_id) {
-        localStorage.basket = item_id;
+// localStorage method of logging items
+      addToBasket(item_id) {
+        this.basket.push(item_id);
+        this.saveBasket();
+        // this.basketCount();
+        this.callToast();
+      },
+
+      removeFromBasket(item_id) {
+        this.basket.splice(item_id, 1);
+        this.saveBasket();
+      },
+
+      saveBasket() {
+        const parsed = JSON.stringify(this.basket);
+        localStorage.setItem('basket', parsed);
+      },
+
+      emptyBasket() {
+        this.basket = [];
+        this.saveBasket();
+      },
+
+// end of localStorage
+
+      callToast() {
+        jQuery(function ($) {
+          $('.toast').toast('show');
+        });
+      },
+
+      fetchOrderConfData() {
+        // fetch locations
+        axios.get(`https://payoo.herokuapp.com/vendor/3/locations`)
+        .then(response => {
+         // JSON responses are automatically parsed.
+         this.locations = response.data.locations
+        })
+        .catch(e => {
+         this.errors.push(e)
+         console.log(this.errors)
+        })
       }
 
+      // basketCount() {
+      //   var basketcount = JSON.parse(localStorage.basket).length;
+      //   document.getElementById("bascnt").innerHTML = basketcount;
+      // }
+
+      // openIndexedDB() {
+      //   //check for support
+      //   if (!window.indexedDB) {
+      //     console.log('This browser doesn\'t support IndexedDB');
+      //     return;
+      //   }
+      //
+      //   var db;
+      //   var request = indexedDB.open("basket_db");
+      //   request.onerror = function(event) {
+      //     console.log("Unable to open IndexedDB!");
+      //   };
+      //   request.onsuccess = function(event) {
+      //     db = event.target.result;
+      //   };
+      // },
+      //
+      // addItemToDB(item) {
+      //   dbPromise.then(function(db) {
+      //     var tx = db.transaction('basket', 'readwrite');
+      //     var store = tx.objectStore('basket');
+      //     var itemadd = {
+      //       name: item.name,
+      //       price: item.std_price,
+      //       description: item.description,
+      //       image_path: item.image_path
+      //     };
+      //     store.add(itemadd);
+      //     return tx.complete;
+      //   }).then(function() {
+      //     console.log('added item to the store os!');
+      //   });
+      // },
+
+    // end of methods
     },
 
     // Fetches posts when the component is created.
     mounted() {
       this.retrieveCategories();
       this.retrieveItems(this.cat);
-      if (localStorage.basket) {
-        this.basket = localStorage.basket;
+      // this.openIndexedDB();
+
+      // localStorage method of logging items
+      if (localStorage.getItem('basket')) {
+        try {
+          this.basket = JSON.parse(localStorage.getItem('basket'));
+        } catch(e) {
+          localStorage.removeItem('basket');
+        }
       }
+      // end
     },
 
 })

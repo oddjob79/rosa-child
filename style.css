@@ -1,9 +1,10 @@
 /*
- Theme Name:  Vue Theme
+ Theme Name:  Payoo Menu
  description: Test Vue Theme
- Author:       Robert Turner
- Template:     onepress
+ Author:       Robert Turner - Payoo
+ Template:     rosa
  Version:      1.0.0
+ Text Domain:  rosa-child
 */
 
 @media (min-width: 768px) {
@@ -11,4 +12,17 @@
       margin: .5em;
       border: 2px #343a40 solid;
     }
+}
+
+.fixed-badge {
+    position: fixed;
+    z-index: 999;
+    top: 20%;
+    right: 2%;
+}
+
+.toast-basket {
+  position: absolute;
+  top: 2%;
+  left: 0;
 }
